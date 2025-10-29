@@ -26,84 +26,185 @@
             if (inputPass !== CORRECT_PASSWORD) {
                 profileDiv.innerHTML = "<p style='color:red;font-weight:bold;'>❌ Mật khẩu sai! Không thể xem hồ sơ.</p>";
             } else {
-                fetch(API_URL)
-                    .then(res => res.json())
-                    .then(data => {
-                        const qn = data.find(x => x.MaQN === id);
-                        if (!qn) return profileDiv.innerHTML = "<p>Không tìm thấy hồ sơ quân nhân.</p>";
-
-                        const formatDate = (dateStr) => {
-                            if (!dateStr) return "";
-                            return new Date(dateStr).toLocaleDateString("vi-VN", {
-                                timeZone: "Asia/Ho_Chi_Minh",
-                                day: "2-digit",
-                                month: "2-digit",
-                                year: "numeric"
-                            });
-                        };
-
-                        // Ảnh mặc định
-                        const avatar = qn.HinhAnh?.[0]?.URLAnh || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
-                        const cover = "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=1200&q=80";
-
-                        // Render giao diện
-                        const html = `
-              <div class="cover-photo">
-                <img src="${cover}" alt="Ảnh bìa">
-                <div class="avatar"><img src="${avatar}" alt="Ảnh đại diện"></div>
-              </div>
-
-              <div class="profile-header">
-                <h1>${qn.HoTen || "Không rõ tên"}</h1>
-                <p>${qn.ChucVu || ""} • ${qn.DonVi || ""}</p>
-              </div>
-
-              <div class="profile-body">
-                <!-- Cột trái -->
-                <div class="profile-sidebar">
-                  <h2>Giới thiệu</h2>
-                  <p><strong>Mã:</strong> ${qn.MaQN || ""}</p>
-                  <p><strong>Ngày sinh:</strong> ${formatDate(qn.NgaySinh)}</p>
-                  <p><strong>Quê quán:</strong> ${qn.QueQuan || ""}</p>
-                  <p><strong>Rèn luyện:</strong> ${qn.THRenLuyen || ""}</p>
-                </div>
-
-                <!-- Cột phải -->
-                <div class="profile-content">
-                  <h2>Nhận xét</h2>
-                  ${(qn.NhanXet || [])
-                                .map(n => {
-                                    const ngay = formatDate(n.NgayDanhGia);
-                                    const noiDung = n.NoiDungNX || n.NgNhanXet || "Không có nhận xét";
-                                    return `
-                        <div class="post">
-                          <div class="post-header">
-                            <img class="post-avatar" src="${avatar}" alt="avatar">
-                            <div>
-                              <h3>${qn.HoTen}</h3>
-                              <span>${ngay}</span>
-                            </div>
-                          </div>
-                          <div class="post-content">${noiDung}</div>
-                        </div>`;
-                                })
-                                .join("")}
-                  
-                  <h2>Hình ảnh</h2>
-                  <div class="images">
-                    ${(qn.HinhAnh || [])
-                                .map(h => `<img src="${h.URLAnh}" alt="Hình quân nhân">`)
-                                .join("")}
-                  </div>
-                </div>
-              </div>
-            `;
-                        profileDiv.innerHTML = html;
-                    })
-                    .catch(err => profileDiv.innerHTML = `<p style='color:red;'>Lỗi tải dữ liệu: ${err}</p>`);
+                loadProfile();
             }
         }
+
+        async function loadProfile() {
+            try {
+                const res = await fetch(API_URL);
+                const data = await res.json();
+                const qn = data.find(x => x.MaQN === id);
+                if (!qn) return (profileDiv.innerHTML = "<p>Không tìm thấy hồ sơ quân nhân.</p>");
+                renderProfile(qn);
+            } catch (err) {
+                profileDiv.innerHTML = `<p style='color:red;'>Lỗi tải dữ liệu: ${err}</p>`;
+            }
+        }
+
+        function renderProfile(qn) {
+            const formatDate = (dateStr) => {
+                if (!dateStr) return "";
+                return new Date(dateStr).toLocaleDateString("vi-VN", {
+                    timeZone: "Asia/Ho_Chi_Minh",
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric"
+                });
+            };
+
+            const avatar = qn.HinhAnh?.[0]?.URLAnh || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+            const cover = "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=1200&q=80";
+
+            profileDiv.innerHTML = `
+    <div class="cover-photo">
+      <img src="${cover}" alt="Ảnh bìa">
+      <div class="avatar"><img src="${avatar}" alt="Ảnh đại diện"></div>
+    </div>
+
+    <div class="profile-header">
+      <h1>${qn.HoTen || "Không rõ tên"}</h1>
+      <p>${qn.ChucVu || ""} • ${qn.DonVi || ""}</p>
+    </div>
+
+    <div class="profile-body">
+      <div class="profile-sidebar">
+        <h2>Giới thiệu</h2>
+        <p><strong>Mã:</strong> ${qn.MaQN || ""}</p>
+        <p><strong>Ngày sinh:</strong> ${formatDate(qn.NgaySinh)}</p>
+        <p><strong>Quê quán:</strong> ${qn.QueQuan || ""}</p>
+        <p><strong>Rèn luyện:</strong> ${qn.THRenLuyen || ""}</p>
+      </div>
+
+      <div class="profile-content">
+        <h2>Nhận xét</h2>
+        <div id="nhanxet-list">
+          ${(qn.NhanXet || []).map((n, i) => `
+            <div class="post">
+              <div class="post-header">
+                <img class="post-avatar" src="${avatar}" alt="avatar">
+                <div>
+                  <h3>${qn.HoTen}</h3>
+                  <span>${formatDate(n.NgayDanhGia)}</span>
+                </div>
+              </div>
+              <div class="post-content" id="comment-${i}">${n.NoiDungNX || "Không có nhận xét"}</div>
+              <div class="actions">
+                <button class="edit-btn" onclick="editNhanXet('${qn.MaQN}', ${i}, '${encodeURIComponent(n.NoiDungNX || "")}')">✏ Sửa</button>
+                <button class="delete-btn" onclick="deleteNhanXet('${qn.MaQN}', ${i})">🗑 Xóa</button>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+
+        <div class="add-form">
+          <textarea id="nhanxet-input" placeholder="Nhập nhận xét mới..."></textarea>
+          <button onclick="addNhanXet('${qn.MaQN}')">➕ Thêm nhận xét</button>
+        </div>
+
+        <h2>Hình ảnh</h2>
+        <div class="images" id="image-list">
+          ${(qn.HinhAnh || []).map((h, i) => `
+            <div class="img-box">
+              <img src="${h.URLAnh}" alt="Ảnh quân nhân">
+              <button class="delete-btn" onclick="deleteHinhAnh('${qn.MaQN}', ${i})">✖</button>
+            </div>
+          `).join("")}
+        </div>
+
+        <div class="add-form">
+          <input type="text" id="url-input" placeholder="Dán URL ảnh...">
+          <button onclick="addHinhAnh('${qn.MaQN}')">📸 Thêm ảnh</button>
+        </div>
+      </div>
+    </div>
+  `;
+        }
+
+        /* ====================== CRUD ====================== */
+
+        async function addNhanXet(MaQN) {
+            const text = document.getElementById("nhanxet-input").value.trim();
+            if (!text) return alert("Vui lòng nhập nội dung nhận xét!");
+            const body = { action: "add_nhanxet", data: { MaQN, NoiDungNX: text, NgayDanhGia: new Date().toISOString() } };
+
+            const res = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body),
+            });
+            const data = await res.json();
+            if (data.ok) {
+                alert("✅ Đã thêm nhận xét!");
+                loadProfile();
+            } else alert("❌ " + data.message);
+        }
+
+        async function editNhanXet(MaQN, index, oldTextEncoded) {
+            const oldText = decodeURIComponent(oldTextEncoded);
+            const newText = prompt("✏ Nhập nội dung mới cho nhận xét:", oldText);
+            if (newText === null) return; // bấm Cancel
+            const body = { action: "edit_nhanxet", MaQN, index, NoiDungNX: newText };
+
+            const res = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body),
+            });
+            const data = await res.json();
+            if (data.ok) {
+                alert("✅ Đã cập nhật nhận xét!");
+                loadProfile();
+            } else alert("❌ " + data.message);
+        }
+
+        async function deleteNhanXet(MaQN, index) {
+            if (!confirm("Xóa nhận xét này?")) return;
+            const body = { action: "delete_nhanxet", MaQN, index };
+            const res = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body),
+            });
+            const data = await res.json();
+            if (data.ok) {
+                alert("🗑 Đã xóa nhận xét!");
+                loadProfile();
+            } else alert("❌ " + data.message);
+        }
+
+        async function addHinhAnh(MaQN) {
+            const url = document.getElementById("url-input").value.trim();
+            if (!url) return alert("Nhập URL ảnh!");
+            const body = { action: "add_hinhanh", data: { MaQN, URLAnh: url } };
+            const res = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body),
+            });
+            const data = await res.json();
+            if (data.ok) {
+                alert("📸 Ảnh đã được thêm!");
+                loadProfile();
+            } else alert("❌ " + data.message);
+        }
+
+        async function deleteHinhAnh(MaQN, index) {
+            if (!confirm("Xóa ảnh này?")) return;
+            const body = { action: "delete_hinhanh", MaQN, index };
+            const res = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body),
+            });
+            const data = await res.json();
+            if (data.ok) {
+                alert("🗑 Đã xóa ảnh!");
+                loadProfile();
+            } else alert("❌ " + data.message);
+        }
     </script>
+
 </body>
 
 </html>

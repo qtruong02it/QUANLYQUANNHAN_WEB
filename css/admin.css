@@ -12,11 +12,11 @@ h1 {
     margin-bottom: 30px;
 }
 
-/* Ô nhập và nút */
+/* Input + Button */
 #token {
     padding: 10px;
     font-size: 16px;
-    width: 250px;
+    width: 260px;
     border: 1px solid #ccc;
     border-radius: 6px;
     margin-right: 10px;
@@ -37,7 +37,7 @@ h1 {
     background-color: #0056b3;
 }
 
-/* Danh sách kết quả */
+/* Danh sách */
 #list {
     margin-top: 30px;
     display: grid;
@@ -45,7 +45,7 @@ h1 {
     gap: 20px;
 }
 
-/* Card từng hồ sơ */
+/* Card */
 .profile-card {
     background: white;
     border: 1px solid #ddd;
@@ -84,6 +84,7 @@ h1 {
     font-size: 13px;
     border-radius: 4px;
     cursor: pointer;
+    transition: opacity 0.2s;
 }
 
 .profile-card button.delete {
@@ -94,7 +95,7 @@ h1 {
     opacity: 0.9;
 }
 
-/* Dark mode support (tự động theo hệ thống) */
+/* Dark mode */
 @media (prefers-color-scheme: dark) {
     body {
         background: #1e1e1e;
