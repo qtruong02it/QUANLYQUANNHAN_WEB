@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Admin</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <h1>Admin - Quản lý hồ sơ</h1>
+
+    <section>
+        <h2>Thêm hồ sơ mới</h2>
+        <form id="addForm">
+            <input name="MaQN" placeholder="MaQN" required>
+            <input name="HoTen" placeholder="HoTen">
+            <input name="ChucVu" placeholder="ChucVu">
+            <input name="DonVi" placeholder="DonVi">
+            <input name="THRenLuyen" placeholder="THRenLuyen">
+            <button type="submit">Thêm</button>
+        </form>
+    </section>
+
+    <section>
+        <h2>Chỉnh sửa / Xóa</h2>
+        <form id="editForm">
+            <input name="MaQN" placeholder="MaQN (bắt buộc)" required>
+            <input name="HoTen" placeholder="HoTen">
+            <input name="ChucVu" placeholder="ChucVu">
+            <input name="DonVi" placeholder="DonVi">
+            <button type="submit">Cập nhật</button>
+            <button id="delBtn" type="button">Xóa</button>
+        </form>
+    </section>
+
+    <div id="msg"></div>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbxMiH-XTO5UHI5QPYr7KJ8kNycRWr80Fysw7H-tIXMLTWVOarwzsjHHbg2-4D8GBg_jkA/exec"; // <-- thay
+
+        function show(msg) { document.getElementById('msg').innerText = msg; }
+
+        document.getElementById('addForm').addEventListener('submit', async e => {
+            e.preventDefault();
+            const data = Object.fromEntries(new FormData(e.target).entries());
+            const body = { action: "add_thongtin", data };
+            const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+            const j = await res.json();
+            show(JSON.stringify(j));
+        });
+
+        document.getElementById('editForm').addEventListener('submit', async e => {
+            e.preventDefault();
+            const data = Object.fromEntries(new FormData(e.target).entries());
+            data.action = "edit_thongtin";
+            const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+            const j = await res.json();
+            show(JSON.stringify(j));
+        });
+
+        document.getElementById('delBtn').addEventListener('click', async () => {
+            const MaQN = document.querySelector('#editForm [name=MaQN]').value;
+            if (!MaQN) return show('Nhập MaQN để xóa');
+            const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'delete_thongtin', MaQN }) });
+            const j = await res.json();
+            show(JSON.stringify(j));
+        });
+    </script>
+</body>
+
+</html>

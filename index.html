@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Danh sách quân nhân</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <h1>Danh sách quân nhân</h1>
+  <div id="list"></div>
+
+  <!-- QR lib -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbxMiH-XTO5UHI5QPYr7KJ8kNycRWr80Fysw7H-tIXMLTWVOarwzsjHHbg2-4D8GBg_jkA/exec"; // <-- thay bằng URL Apps Script
+
+    async function load() {
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      const list = document.getElementById('list');
+      data.forEach(qn => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+      <div class="info">
+        <h3>${qn.HoTen || ''}</h3>
+        <p><strong>Mã:</strong> ${qn.MaQN || ''}</p>
+        <p><strong>Đơn vị:</strong> ${qn.DonVi || ''}</p>
+      </div>
+      <div id="qr-${qn.MaQN}" class="qr"></div>
+      <div class="actions"><a href="profile.html?id=${encodeURIComponent(qn.MaQN)}">Xem profile</a></div>
+    `;
+        list.appendChild(card);
+        new QRCode(document.getElementById(`qr-${qn.MaQN}`), {
+          text: `${window.location.origin}/profile.html?id=${qn.MaQN}`,
+          width: 96, height: 96
+        });
+      });
+    }
+
+    load().catch(e => document.getElementById('list').innerText = 'Lỗi: ' + e);
+  </script>
+</body>
+
+</html>
