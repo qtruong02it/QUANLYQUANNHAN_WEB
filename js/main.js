@@ -23,17 +23,11 @@ async function loadQuanNhan() {
         list.appendChild(div);
 
         // Tạo QR code
-        // Tự động tạo link QR chính xác cho cả localhost và GitHub Pages
-        const basePath = window.location.origin + window.location.pathname.replace(/index\.html$/, '');
-        new QRCode(document.getElementById(`qr-${qn.MaQN}`), {
-            text: `${basePath}profile.html?id=${qn.MaQN}`,
+        new QRCode(document.getElementById(`qr_${qn.MaQN}`), {
+            text: `${window.location.origin}/profile.html?id=${qn.MaQN}`,
             width: 100,
-            height: 100,
-            colorDark: "#0d47a1",
-            colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.H
+            height: 100
         });
-
     });
 }
 
