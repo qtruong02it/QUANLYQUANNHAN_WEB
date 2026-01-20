@@ -34,8 +34,13 @@
       <div class="actions"><a href="profile.html?id=${encodeURIComponent(qn.MaQN)}">Xem profile</a></div>
     `;
         list.appendChild(card);
+
+        // Trung
+        const BASE_URL = "https://qtruong02it.github.io/QUANLYQUANNHAN_WEB";
+
         new QRCode(document.getElementById(`qr-${qn.MaQN}`), {
-          text: `${window.location.origin}/profile.html?id=${qn.MaQN}`,
+          text: `${BASE_URL}/profile.html?id=${qn.MaQN}`,
+          // text: `${window.location.origin}/profile.html?id=${qn.MaQN}`, // lỗi, vì đang dùng ip local, client như điện thoại khác không truy cập được
           width: 96, height: 96
         });
       });

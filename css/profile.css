@@ -1,15 +1,21 @@
-/* ==== RESET + TỔNG THỂ ==== */
+/* ================= RESET + TỔNG THỂ ================= */
 body {
     font-family: "Segoe UI", Arial, sans-serif;
-    background: #f0f2f5;
     margin: 0;
     color: #1c1e21;
+
+    /* Background toàn trang + overlay */
+    background: url("https://images.unsplash.com/photo-1509021436665-8f07dbf5bf1d?w=1920&q=80");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+
 }
 
-/* ==== NÚT TRỞ VỀ ==== */
+/* ================= NÚT TRỞ VỀ ================= */
 button {
     background: #1b74e4;
-    color: white;
+    color: #fff;
     border: none;
     padding: 10px 16px;
     border-radius: 6px;
@@ -24,12 +30,12 @@ button:hover {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* ==== CONTAINER ==== */
+/* ================= CONTAINER PROFILE ================= */
 #profile {
     max-width: 900px;
     margin: 0 auto 40px;
     background: #fff;
-    border-radius: 10px;
+    border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     overflow: hidden;
     animation: fadeIn 0.6s ease;
@@ -47,13 +53,13 @@ button:hover {
     }
 }
 
-/* ==== ẢNH BÌA ==== */
+/* ================= ẢNH BÌA ================= */
 .cover-photo {
     width: 100%;
-    height: 240px;
-    overflow: hidden;
+    height: 420px;
+    /* ⬅ chiều cao chuẩn */
     position: relative;
-    background: #dbeafe;
+    overflow: hidden;
 }
 
 .cover-photo img {
@@ -62,30 +68,51 @@ button:hover {
     object-fit: cover;
 }
 
-/* ==== ẢNH ĐẠI DIỆN ==== */
-.avatar {
-    width: 130px;
-    height: 130px;
-    border-radius: 50%;
-    overflow: hidden;
-    border: 5px solid #fff;
+/* Overlay cho ảnh bìa */
+.cover-photo::after {
+    content: "";
     position: absolute;
-    bottom: -60px;
-    left: 50%;
-    transform: translateX(-50%);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    inset: 0;
+    background: linear-gradient(to bottom,
+            rgba(0, 0, 0, 0.25),
+            rgba(0, 0, 0, 0.45));
+}
+
+
+/* ================= AVATAR ================= */
+.avatar {
+    width: 140px !important;
+    height: 140px !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+
+    position: absolute !important;
+    left: 50% !important;
+    bottom: -70px !important;
+    transform: translateX(-50%) !important;
+
+    background: #fff !important;
+    border: 5px solid #fff !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 10 !important;
 }
 
 .avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 50% !important;
 }
 
-/* ==== HEADER ==== */
+/* ================= HEADER ================= */
 .profile-header {
     text-align: center;
-    padding-top: 80px;
+    padding-top: 90px;
+    /* chừa chỗ cho avatar */
     padding-bottom: 16px;
 }
 
@@ -93,6 +120,7 @@ button:hover {
     margin: 0;
     color: #050505;
     font-size: 26px;
+    font-weight: 700;
 }
 
 .profile-header p {
@@ -101,7 +129,7 @@ button:hover {
     font-size: 15px;
 }
 
-/* ==== BODY ==== */
+/* ================= BODY ================= */
 .profile-body {
     display: flex;
     flex-wrap: wrap;
@@ -109,7 +137,7 @@ button:hover {
     gap: 20px;
 }
 
-/* ==== CỘT TRÁI ==== */
+/* ================= SIDEBAR (GIỚI THIỆU) ================= */
 .profile-sidebar {
     flex: 1;
     min-width: 250px;
@@ -136,7 +164,7 @@ button:hover {
     color: #1b74e4;
 }
 
-/* ==== CỘT PHẢI ==== */
+/* ================= CONTENT ================= */
 .profile-content {
     flex: 2;
     min-width: 300px;
@@ -148,7 +176,7 @@ button:hover {
     margin-bottom: 12px;
 }
 
-/* ==== POST ==== */
+/* ================= POST / NHẬN XÉT ================= */
 .post {
     background: #fff;
     border-radius: 8px;
@@ -186,7 +214,7 @@ button:hover {
     line-height: 1.5;
 }
 
-/* ==== HÌNH ẢNH ==== */
+/* ================= HÌNH ẢNH ================= */
 .images {
     display: flex;
     flex-wrap: wrap;
@@ -196,8 +224,8 @@ button:hover {
 }
 
 .images img {
-    width: 160px;
-    height: 160px;
+    width: 200px;
+    height: 200px;
     border-radius: 10px;
     object-fit: cover;
     box-shadow: 0 1px 6px rgba(0, 0, 0, 0.15);
@@ -208,39 +236,32 @@ button:hover {
     transform: scale(1.05);
 }
 
-/* ==== RESPONSIVE ==== */
+.images img:only-child {
+    width: 260px;
+    height: 260px;
+}
+
+/* ================= RESPONSIVE ================= */
 @media (max-width: 768px) {
     .profile-body {
         flex-direction: column;
     }
 
-    .avatar {
-        width: 100px;
-        height: 100px;
-        bottom: -50px;
+    .cover-photo {
+        height: 260px;
     }
 
-    .cover-photo {
-        height: 180px;
+    .avatar {
+        width: 100px !important;
+        height: 100px !important;
+        bottom: -50px !important;
+    }
+
+    .profile-header {
+        padding-top: 70px;
     }
 
     .profile-header h1 {
         font-size: 22px;
     }
-
-    .edit-btn {
-        background: #ffc107;
-        color: #222;
-        border: none;
-        padding: 4px 8px;
-        font-size: 13px;
-        border-radius: 6px;
-        cursor: pointer;
-        margin-right: 4px;
-    }
-
-    .edit-btn:hover {
-        background: #e0a800;
-    }
-
 }

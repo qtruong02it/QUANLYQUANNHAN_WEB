@@ -1,72 +1,62 @@
-// ✅ Cấu hình
-const API_BASE = "https://script.google.com/macros/s/AKfycbxMiH-XTO5UHI5QPYr7KJ8kNycRWr80Fysw7H-tIXMLTWVOarwzsjHHbg2-4D8GBg_jkA/exec";
-
-// Chờ DOM sẵn sàng
+// Kiểm tra DOM sẵn sàng (nếu bạn include file ở bottom của body thì không cần)
 document.addEventListener("DOMContentLoaded", () => {
     const btnLoad = document.getElementById("btnLoad");
-    if (btnLoad) btnLoad.addEventListener("click", onLoadClick);
+    if (btnLoad) {
+        btnLoad.addEventListener("click", onLoadClick);
+    }
 });
 
 async function onLoadClick() {
     const tokenInput = document.getElementById("token");
     const listEl = document.getElementById("list");
 
-    const token = tokenInput?.value.trim();
+    const token = tokenInput ? tokenInput.value.trim() : "";
     if (!token) {
-        alert("⚠️ Vui lòng nhập mật khẩu admin!");
+        alert("Vui lòng nhập admin token!");
         return;
     }
 
     listEl.innerHTML = "<p>Đang tải dữ liệu...</p>";
 
     try {
+        // Cú pháp đúng: dùng template literal để nối URL
         const res = await fetch(`${API_BASE}?token=${encodeURIComponent(token)}`);
         const data = await res.json();
 
         if (!data.ok) throw new Error(data.error || "Không thể tải danh sách");
 
-        renderList(data.results || [], token);
+        // Render danh sách
+        const html = (data.results || [])
+            .map(
+                (p) => `
+        <div class="card">
+          <b>${escapeHtml(p.Hoten) || "(Chưa có tên)"}</b>
+          <span style="margin-left:8px">(${escapeHtml(p.MaQN)}) - ${escapeHtml(p.Donvi || "")}</span>
+          <div style="margin-top:8px">
+            <button onclick="viewProfile('${escapeJs(p.MaQN)}')">Xem</button>
+            <button onclick="editProfile('${escapeJs(p.MaQN)}', '${escapeJs(token)}')">Sửa</button>
+            <button onclick="deleteProfile('${escapeJs(p.MaQN)}', '${escapeJs(token)}')">Xóa</button>
+          </div>
+        </div>`
+            )
+            .join("");
+
+        listEl.innerHTML = html || "<p>Không có dữ liệu</p>";
     } catch (err) {
-        listEl.innerHTML = `<p style="color:red;">❌ Lỗi: ${escapeHtml(err.message)}</p>`;
+        listEl.innerHTML = `<p style="color:red;">Lỗi: ${escapeHtml(err.message || String(err))}</p>`;
     }
 }
 
-function renderList(list, token) {
-    const listEl = document.getElementById("list");
-
-    if (!list.length) {
-        listEl.innerHTML = "<p>Không có dữ liệu.</p>";
-        return;
-    }
-
-    listEl.innerHTML = list
-        .map(
-            (p) => `
-      <div class="profile-card">
-        <h3>${escapeHtml(p.Hoten || "(Chưa có tên)")}</h3>
-        <p><b>Mã:</b> ${escapeHtml(p.MaQN)}</p>
-        <p><b>Đơn vị:</b> ${escapeHtml(p.Donvi || "-")}</p>
-        <p><b>Chức vụ:</b> ${escapeHtml(p.Chucvu || "-")}</p>
-        <div class="actions">
-          <button onclick="viewProfile('${escapeJs(p.MaQN)}')">Xem</button>
-          <button onclick="editProfile('${escapeJs(p.MaQN)}','${escapeJs(token)}')">Sửa</button>
-          <button class="delete" onclick="deleteProfile('${escapeJs(p.MaQN)}','${escapeJs(token)}')">Xóa</button>
-        </div>
-      </div>`
-        )
-        .join("");
-}
-
-// Xem hồ sơ (mở tab mới)
+// Mở trang profile (mở tab mới)
 function viewProfile(MaQN) {
     window.open(`profile.html?id=${encodeURIComponent(MaQN)}`, "_blank");
 }
 
-// Sửa hồ sơ
+// Sửa hồ sơ (ví dụ đơn giản dùng prompt)
 async function editProfile(MaQN, token) {
-    const Hoten = prompt("Nhập họ tên mới (bỏ trống nếu giữ nguyên):");
-    const Donvi = prompt("Nhập đơn vị mới (bỏ trống nếu giữ nguyên):");
-    const Chucvu = prompt("Nhập chức vụ mới (bỏ trống nếu giữ nguyên):");
+    const Hoten = prompt("Cập nhật họ tên (để trống nếu không đổi):");
+    const Donvi = prompt("Cập nhật đơn vị (để trống nếu không đổi):");
+    const Chucvu = prompt("Cập nhật chức vụ (để trống nếu không đổi):");
 
     const updates = {};
     if (Hoten) updates.Hoten = Hoten;
@@ -84,19 +74,18 @@ async function editProfile(MaQN, token) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ token, action: "updateProfile", MaQN, updates }),
         });
-
         const data = await res.json();
         if (!data.ok) throw new Error(data.error || "Cập nhật thất bại");
-        alert("✅ Cập nhật thành công!");
+        alert("Đã cập nhật!");
         document.getElementById("btnLoad").click();
     } catch (err) {
-        alert("❌ Lỗi khi cập nhật: " + err.message);
+        alert("Lỗi khi cập nhật: " + (err.message || err));
     }
 }
 
 // Xóa hồ sơ
 async function deleteProfile(MaQN, token) {
-    if (!confirm(`Bạn chắc chắn muốn xóa hồ sơ: ${MaQN}?`)) return;
+    if (!confirm("Xác nhận xóa hồ sơ " + MaQN + "?")) return;
 
     try {
         const res = await fetch(API_BASE, {
@@ -104,19 +93,19 @@ async function deleteProfile(MaQN, token) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ token, action: "deleteProfile", MaQN }),
         });
-
         const data = await res.json();
         if (!data.ok) throw new Error(data.error || "Xóa thất bại");
-        alert("🗑️ Đã xóa thành công!");
+        alert("Đã xóa!");
         document.getElementById("btnLoad").click();
     } catch (err) {
-        alert("❌ Lỗi khi xóa: " + err.message);
+        alert("Lỗi khi xóa: " + (err.message || err));
     }
 }
 
-// Escape HTML / JS
+// Helper: escape HTML để an toàn khi inject string
 function escapeHtml(str) {
-    return String(str || "")
+    if (str == null) return "";
+    return String(str)
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
@@ -124,6 +113,8 @@ function escapeHtml(str) {
         .replace(/'/g, "&#039;");
 }
 
+// Helper: escape string khi chèn vào onclick JS string literal
 function escapeJs(str) {
-    return String(str || "").replace(/'/g, "\\'");
+    if (str == null) return "";
+    return String(str).replace(/'/g, "\\'");
 }

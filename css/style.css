@@ -1,143 +1,100 @@
-/* Reset cơ bản */
+/* ================= RESET ================= */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0
 }
 
-/* Tổng thể */
+/* ================= BASE ================= */
 body {
     font-family: "Segoe UI", Arial, sans-serif;
     background: #f4f6f9;
     color: #222;
     padding: 24px;
+    /* Background image */
+    background:
+        url("https://i.pinimg.com/originals/a5/e0/0e/a5e00e92348b29c44ce7958848ed1eca.jpg");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
 }
 
-/* Tiêu đề */
 h1 {
     text-align: center;
-    font-size: 28px;
-    margin-bottom: 24px;
+    font-size: 30px;
+    margin-bottom: 28px;
     color: #0d47a1;
+
+    display: inline-block;
+    padding: 12px 28px;
+    border-radius: 16px;
+
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, .3);
 }
 
-/* Container danh sách */
+/* ================= LIST ================= */
 #list {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 22px;
     padding: 20px;
+
 }
 
-/* Mỗi card quân nhân */
+/* ================= CARD ================= */
 .card {
+    position: relative;
+    width: 260px;
+    min-height: 330px;
+    padding: 18px 20px;
+    border-radius: 18px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    width: 260px;
-    min-height: 330px;
-    border-radius: 18px;
-    color: #fff;
     text-align: center;
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
-    padding: 18px 20px;
-    transition: all 0.3s ease;
+    color: #fff;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, .15);
+    transition: .3s ease;
     background-size: 200% 200%;
-    background-position: center;
-    position: relative;
+
 }
 
-/* Các màu khác nhau cho từng card (dựa thứ tự) */
-.card:nth-child(1) {
-    background: linear-gradient(135deg, #2196F3, #21CBF3);
+/* ===== Gradient xoay vòng (không giới hạn số card) ===== */
+.card:nth-child(6n+1) {
+    background: linear-gradient(135deg, #2196F3, #21CBF3)
 }
 
-.card:nth-child(2) {
-    background: linear-gradient(135deg, #FF6F91, #FF9671);
+.card:nth-child(6n+2) {
+    background: linear-gradient(135deg, #FF6F91, #FF9671)
 }
 
-.card:nth-child(3) {
-    background: linear-gradient(135deg, #00BFA6, #3DDC84);
+.card:nth-child(6n+3) {
+    background: linear-gradient(135deg, #00BFA6, #3DDC84)
 }
 
-.card:nth-child(4) {
-    background: linear-gradient(135deg, #F9A825, #FDD835);
+.card:nth-child(6n+4) {
+    background: linear-gradient(135deg, #F9A825, #FDD835)
 }
 
-.card:nth-child(5) {
-    background: linear-gradient(135deg, #9C27B0, #E040FB);
+.card:nth-child(6n+5) {
+    background: linear-gradient(135deg, #9C27B0, #E040FB)
 }
 
-.card:nth-child(6) {
-    background: linear-gradient(135deg, #EF5350, #F06292);
+.card:nth-child(6n+6) {
+    background: linear-gradient(135deg, #EF5350, #F06292)
 }
 
-.card:nth-child(7) {
-    background: linear-gradient(135deg, #f08c8a, #F06292);
-}
-
-.card:nth-child(8) {
-    background: linear-gradient(135deg, #a64fb8, #813467);
-}
-
-.card:nth-child(9) {
-    background: linear-gradient(135deg, #EF5350, #F06292);
-}
-
-.card:nth-child(10) {
-    background: linear-gradient(135deg, #EF5350, #F06292);
-}
-
-.card:nth-child(11) {
-    background: linear-gradient(135deg, #EF5350, #F06292);
-}
-
-.card:nth-child(12) {
-    background: linear-gradient(135deg, #16810c, #51ad4e);
-}
-
-.card:nth-child(13) {
-    background: linear-gradient(135deg, #EF5350, #F06292);
-}
-
-.card:nth-child(14) {
-    background: linear-gradient(135deg, #EF5350, #F06292);
-}
-
-.card:nth-child(15) {
-    background: linear-gradient(135deg, #EF5350, #F06292);
-}
-
-.card:nth-child(16) {
-    background: linear-gradient(135deg, #EF5350, #F06292);
-}
-
-.card:nth-child(17) {
-    background: linear-gradient(135deg, #EF5350, #F06292);
-}
-
-.card:nth-child(18) {
-    background: linear-gradient(135deg, #EF5350, #F06292);
-}
-
-.card:nth-child(19) {
-    background: linear-gradient(135deg, #EF5350, #F06292);
-}
-
-.card:nth-child(20) {
-    background: linear-gradient(135deg, #EF5350, #F06292);
-}
-
-/* Hiệu ứng hover: sáng màu + nổi lên */
+/* Hover */
 .card:hover {
     transform: translateY(-8px) scale(1.03);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-    background-position: right center;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, .25);
+    animation: gradientMove 4s ease infinite;
 }
 
-/* Tên + thông tin */
+/* ================= TEXT ================= */
 .card h3 {
     font-size: 20px;
     font-weight: 700;
@@ -145,55 +102,80 @@ h1 {
 }
 
 .card p {
-    margin: 4px 0;
     font-size: 15px;
-    opacity: 0.9;
+    margin: 4px 0;
+    opacity: .95;
 }
 
-/* QR code */
+.card h3,
+.card p {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .35);
+}
+
+/* ================= BADGE ================= */
+.badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(0, 0, 0, .35);
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 13px;
+}
+
+/* ================= QR ================= */
 .qr {
     margin: 12px 0;
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, .9);
     padding: 8px;
     border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .15);
+    backdrop-filter: blur(4px);
+    transition: .3s;
 }
 
-/* Nút xem profile */
+.card:hover .qr {
+    transform: scale(1.08)
+}
+
+/* ================= ACTION ================= */
 .actions a {
     display: inline-block;
     margin-top: 10px;
-    background: rgba(255, 255, 255, 0.9);
-    color: #000;
-    text-decoration: none;
-    font-weight: 600;
     padding: 8px 14px;
     border-radius: 8px;
-    transition: 0.25s;
+    background: rgba(255, 255, 255, .95);
+    color: #000;
+    font-weight: 600;
+    text-decoration: none;
+    transition: .25s;
 }
 
 .actions a:hover {
     background: #fff;
-    color: #000;
-    box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 12px rgba(255, 255, 255, .8);
     transform: scale(1.05);
 }
 
-/* Hiệu ứng ánh sáng chạy (animation nhẹ cho vui mắt) */
+/* ================= ANIMATION ================= */
 @keyframes gradientMove {
     0% {
-        background-position: 0% 50%;
+        background-position: 0% 50%
     }
 
     50% {
-        background-position: 100% 50%;
+        background-position: 100% 50%
     }
 
     100% {
-        background-position: 0% 50%;
+        background-position: 0% 50%
     }
 }
 
-.card {
-    animation: gradientMove 8s ease infinite;
+/* ================= RESPONSIVE ================= */
+@media(max-width:480px) {
+    .card {
+        width: 100%;
+        max-width: 320px
+    }
 }

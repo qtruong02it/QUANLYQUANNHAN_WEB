@@ -17,14 +17,19 @@ async function loadQuanNhan() {
             <p><strong>Đơn vị:</strong> ${qn.DonVi}</p>
             <a href="profile.html?id=${qn.MaQN}" class="profile-link">Xem hồ sơ</a>
         </div>
-        <div class="qr" id="qr_${qn.MaQN}"></div>
+        <div class="qr" id="qr-${qn.MaQN}"></div>
         `;
 
         list.appendChild(div);
 
+        // Trung
+        const BASE_URL = "https://qtruong02it.github.io/QUANLYQUANNHAN_WEB";
+
         // Tạo QR code
-        new QRCode(document.getElementById(`qr_${qn.MaQN}`), {
-            text: `${window.location.origin}/profile.html?id=${qn.MaQN}`,
+        new QRCode(document.getElementById(`qr-${qn.MaQN}`), {
+            text: `${BASE_URL}/profile.html?id=${qn.MaQN}`,
+
+            // text: `${window.location.origin}/profile.html?id=${qn.MaQN}`, // lỗi, vì đang dùng ip local, client như điện thoại khác không truy cập được
             width: 100,
             height: 100
         });
