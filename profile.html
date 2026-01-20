@@ -4,49 +4,105 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Danh sách quân nhân</title>
-  <link rel="stylesheet" href="css/style.css">
+  <title>Hồ sơ quân nhân</title>
+  <link rel="stylesheet" href="css/profile.css">
 </head>
 
 <body>
-  <h1>Danh sách quân nhân</h1>
-  <div id="list"></div>
+  <button onclick="location.href='index.html'">← Trở về</button>
+  <div id="profile"></div>
 
-  <!-- QR lib -->
-  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbzEyyRXAESj6LPw8AZiudlOnSdoR4-WIYys_pMn8kToBYgImyoDm-vabvAjEJDN8VYZ-w/exec"; // <-- thay bằng URL Apps Script
+    const API_URL = "https://script.google.com/macros/s/AKfycbzEyyRXAESj6LPw8AZiudlOnSdoR4-WIYys_pMn8kToBYgImyoDm-vabvAjEJDN8VYZ-w/exec";
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+    const profileDiv = document.getElementById("profile");
 
-    async function load() {
-      const res = await fetch(API_URL);
-      const data = await res.json();
-      const list = document.getElementById('list');
-      data.forEach(qn => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-      <div class="info">
-        <h3>${qn.HoTen || ''}</h3>
-        <p><strong>Mã:</strong> ${qn.MaQN || ''}</p>
-        <p><strong>Đơn vị:</strong> ${qn.DonVi || ''}</p>
-      </div>
-      <div id="qr-${qn.MaQN}" class="qr"></div>
-      <div class="actions"><a href="profile.html?id=${encodeURIComponent(qn.MaQN)}">Xem profile</a></div>
-    `;
-        list.appendChild(card);
+    if (!id) {
+      profileDiv.innerHTML = "<p>❌ Thiếu mã quân nhân!</p>";
+    } else {
+      const CORRECT_PASSWORD = "080304";
+      const inputPass = prompt("🔒 Nhập mật khẩu để xem hồ sơ:");
+      if (inputPass !== CORRECT_PASSWORD) {
+        profileDiv.innerHTML = "<p style='color:red;font-weight:bold;'>❌ Mật khẩu sai! Không thể xem hồ sơ.</p>";
+      } else {
+        fetch(API_URL)
+          .then(res => res.json())
+          .then(data => {
+            const qn = data.find(x => x.MaQN === id);
+            if (!qn) return profileDiv.innerHTML = "<p>Không tìm thấy hồ sơ quân nhân.</p>";
 
-        // Trung
-        const BASE_URL = "https://qtruong02it.github.io/QUANLYQUANNHAN_WEB";
+            const formatDate = (dateStr) => {
+              if (!dateStr) return "";
+              return new Date(dateStr).toLocaleDateString("vi-VN", {
+                timeZone: "Asia/Ho_Chi_Minh",
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric"
+              });
+            };
 
-        new QRCode(document.getElementById(`qr-${qn.MaQN}`), {
-          text: `${BASE_URL}/profile.html?id=${qn.MaQN}`,
-          // text: `${window.location.origin}/profile.html?id=${qn.MaQN}`, // lỗi, vì đang dùng ip local, client như điện thoại khác không truy cập được
-          width: 96, height: 96
-        });
-      });
+            // Ảnh mặc định
+            const avatar = qn.HinhAnh?.[0]?.URLAnh || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+            const cover = "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=1200&q=80";
+
+            // Render giao diện
+            const html = `
+              <div class="cover-photo">
+                <img src="${cover}" alt="Ảnh bìa">
+                <div class="avatar"><img src="${avatar}" alt="https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=1200&q=80"></div>
+              </div>
+
+              <div class="profile-header">
+                <h1>${qn.HoTen || "Không rõ tên"}</h1>
+                <p>${qn.ChucVu || ""} • ${qn.DonVi || ""}</p>
+              </div>
+
+              <div class="profile-body">
+                <!-- Cột trái -->
+                <div class="profile-sidebar">
+                  <h2>Giới thiệu</h2>
+                  <p><strong>Mã:</strong> ${qn.MaQN || ""}</p>
+                  <p><strong>Ngày sinh:</strong> ${formatDate(qn.NgaySinh)}</p>
+                  <p><strong>Quê quán:</strong> ${qn.QueQuan || ""}</p>
+                  <p><strong>Rèn luyện:</strong> ${qn.THRenLuyen || ""}</p>
+                </div>
+
+                <!-- Cột phải -->
+                <div class="profile-content">
+                  <h2>Nhận xét</h2>
+                  ${(qn.NhanXet || [])
+                .map(n => {
+                  const ngay = formatDate(n.NgayDanhGia);
+                  const noiDung = n.NoiDungNX || n.NgNhanXet || "Không có nhận xét";
+                  return `
+                        <div class="post">
+                          <div class="post-header">
+                            <img class="post-avatar" src="${avatar}" alt="avatar">
+                            <div>
+                              <h3>${qn.HoTen}</h3>
+                              <span>${ngay}</span>
+                            </div>
+                          </div>
+                          <div class="post-content">${noiDung}</div>
+                        </div>`;
+                })
+                .join("")}
+                  
+                  <h2>Hình ảnh</h2>
+                  <div class="images">
+                    ${(qn.HinhAnh || [])
+                .map(h => `<img src="${h.AnhHoatDong}" alt="Hình quân nhân">`)
+                .join("")}
+                  </div>
+                </div>
+              </div>
+            `;
+            profileDiv.innerHTML = html;
+          })
+          .catch(err => profileDiv.innerHTML = `<p style='color:red;'>Lỗi tải dữ liệu: ${err}</p>`);
+      }
     }
-
-    load().catch(e => document.getElementById('list').innerText = 'Lỗi: ' + e);
   </script>
 </body>
 
